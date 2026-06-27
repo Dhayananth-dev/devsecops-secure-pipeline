@@ -13,3 +13,20 @@ jobs:
           uses: gitleaks/gitleaks-action@v2
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+      
+  docker-scanner:
+      runs-on: ubuntu-latest
+      needs: secret-scanner  
+      steps:
+        - name: checkout code
+          uses: actions/checkout@v3
+          
+        - name:  Build Docker image
+          run: docker build -t secure-app .
+
+        - name: Run Trivy Scanner
+          uses: aquasecurity/trivy-action@master
+          with:
+            image-ref: secure-app
+            format: table
+            severity: CRITICAL,HIGH  
